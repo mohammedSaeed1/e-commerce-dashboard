@@ -1,11 +1,12 @@
 import express from 'express';
+import { databaseConnection } from './database/connetcion.js';
 
 export const bootstrap = () => {
 
     const app = express();
     app.use(express.json());
+    databaseConnection();
 
-    
 
 
 
