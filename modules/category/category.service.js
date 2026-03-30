@@ -51,3 +51,11 @@ export const updateCategory = async (req, res) => {
   const updatedCategory = await Category.findByIdAndUpdate(category._id,{ name, slug, image },{returnDocument:"after"});
   res.status(201).json({ message: "success", data: { updatedCategory } });
 }
+
+export const deleteCategory = async (req , res) =>{
+    const {id} = req.params;
+    const category = await Category.findById(id);
+    if(!category) return res.status(404).json({message:"this category is not exists"});
+    await Category.findByIdAndDelete(category._id);
+    res.status(200).json({message:"success"});
+}
