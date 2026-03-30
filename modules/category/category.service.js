@@ -4,7 +4,9 @@ import { Category } from '../../database/model/category.model.js';
 
 export const createCategory = async (req , res) =>{
 //    const imageCover = req.body.image ? image : null;
-    const {name} = req.body;
+const {name , image} = req.body;
+   console.log("Ana ahoo" , req.file);
+   
     const slug = slugify(name,{lower: true});
     const isCategory = await Category.findOne({slug});
     if(isCategory) return  res.status(400).json({message:"This category is already exists"});
