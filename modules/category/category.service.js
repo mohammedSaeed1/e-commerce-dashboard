@@ -31,3 +31,23 @@ export const getCategoryById = async (req , res) =>{
     if(!category) return res.status(404).json({message:"this category is not exists"});
     res.status(200).json({message:"success",data:{category}});
 }
+
+export const updateCategory = async (req, res) => {
+  const {id} = req.params;
+  const {name} = req.body;
+  let image;
+  const category = await Category.findById(id);
+  if(!category) return res.status(404).json({ message: "This category is not exists" });
+  if (req.file) {
+  try {
+    image = await uploadImageToCloudinary(req.file.buffer, "categories");
+  } catch (err) {
+    return res.status(500).json({ message: "Image upload failed" });
+  }
+}
+  const slug = slugify(name, { lower: true });
+  const isCategory = await Category.findOne({ slug });
+  if (isCategory) return res.status(400).json({ message: "There is a category with same name!!" });
+  const updatedCategory = await Category.findByIdAndUpdate(category._id,{ name, slug, image },{returnDocument:"after"});
+  res.status(201).json({ message: "success", data: { updatedCategory } });
+}
