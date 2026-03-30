@@ -18,3 +18,9 @@ export const createCategory = async (req, res) => {
   const category = await Category.create({ name, slug, image });
   res.status(201).json({ message: "success", data: { category } });
 }
+
+export const getAllCategories = async (req , res) =>{
+    const categories = await Category.find();
+    if(categories.length <= 0) return res.status(400).json({message:"No categories at this time"});
+    res.status(200).json({message:"success",data:{categories}});
+}
