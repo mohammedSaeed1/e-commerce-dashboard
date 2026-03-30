@@ -1,11 +1,11 @@
 import slugify from 'slugify';
 import { Category } from '../../database/model/category.model.js';
-
+import cloudinary from '../../config/cloudinary.js';
 
 export const createCategory = async (req , res) =>{
 //    const imageCover = req.body.image ? image : null;
 const {name , image} = req.body;
-   console.log("Ana ahoo" , req.file);
+   console.log("Ana ahoo" , req.file.buffer);
    
     const slug = slugify(name,{lower: true});
     const isCategory = await Category.findOne({slug});
