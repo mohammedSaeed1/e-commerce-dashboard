@@ -1,9 +1,28 @@
 import { Product } from "../../database/model/product.model.js";
+import { Brand } from "../../database/model/brand.model.js";
+import { Category } from "../../database/model/category.model.js";
+import slugify from "slugify";
+import { uploadImageToCloudinary } from "../../utilts/cloudinary.js";
 
-
-// export const createProduct = async (req , res) =>{
-//     const {title , description , price , category , brand } = req.body; 
-// }
+export const createProduct = async (req , res) =>{
+    const {title , description , price , category , brand } = req.body;
+    let image;
+     const isCategory = await Category.findById(category);
+     if(!isCategory) return res.status(404).json({message:"Category is not found!!!"});
+      const isBrand = await Brand.findById(brand);
+     if(!isBrand) return res.status(404).json({message:"Brand is not found!!!"});
+      const slug = slugify(title,{lower:true});
+        if (req.file) {
+        try {
+          image = await uploadImageToCloudinary(req.file.buffer, "products");
+        } catch (err) {
+          return res.status(500).json({ message: "Image upload failed" });
+        }
+      }
+      const product = await Product.create({title , slug , price , description , category , brand , image});
+      if(!product) return res.status(500).json({message:"Internal server error"});
+      res.status(201).json({message:"success",data:{product}});
+    }
 
 export const getAllProducts = async (req , res) =>{
     const products = await Product.find();
