@@ -37,6 +37,25 @@ export const getProductById = async (req, res) => {
     res.status(200).json({ message: "success", data: product });
 }
 
+export const updateProduct = async (req, res) => {
+    const {id} = req.params;
+    const { title, description, price} = req.body;
+    const isProduct = await Product.findById(id);
+    if(!isProduct) return res.status(404).json({message:"Product is not found!!"});
+    let image , slug;
+    if(title){slug = slugify(title, { lower: true });}
+    if (req.file) {
+        try {
+            image = await uploadImageToCloudinary(req.file.buffer, "products");
+        } catch (err) {
+            return res.status(500).json({ message: "Image upload failed" });
+        }
+    }
+    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ title, slug, price, description ,image },{returnDocument:"after"});
+    if (!updatedProduct) return res.status(500).json({ message: "Internal server error" });
+    res.status(200).json({ message: "success", data: { updatedProduct } });
+}
+
 export const deleteProduct = async (req, res) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
