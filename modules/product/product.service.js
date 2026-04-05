@@ -5,13 +5,13 @@ import slugify from "slugify";
 import { uploadImageToCloudinary } from "../../utilts/cloudinary.js";
 
 export const createProduct = async (req, res) => {
-    const { title, description, price, category, brand } = req.body;
+    const { name, description, price, category, brand , stock} = req.body;
     let image;
     const isCategory = await Category.findById(category);
     if (!isCategory) return res.status(404).json({ message: "Category is not found!!!" });
     const isBrand = await Brand.findById(brand);
     if (!isBrand) return res.status(404).json({ message: "Brand is not found!!!" });
-    const slug = slugify(title, { lower: true });
+    const slug = slugify(name, { lower: true });
     if (req.file) {
         try {
             image = await uploadImageToCloudinary(req.file.buffer, "products");
@@ -19,7 +19,7 @@ export const createProduct = async (req, res) => {
             return res.status(500).json({ message: "Image upload failed" });
         }
     }
-    const product = await Product.create({ title, slug, price, description, category, brand, image });
+    const product = await Product.create({ name, slug, price, description,stock, category, brand, image });
     if (!product) return res.status(500).json({ message: "Internal server error" });
     res.status(201).json({ message: "success", data: { product } });
 }
@@ -39,11 +39,11 @@ export const getProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     const {id} = req.params;
-    const { title, description, price} = req.body;
+    const { name, description, price} = req.body;
     const isProduct = await Product.findById(id);
     if(!isProduct) return res.status(404).json({message:"Product is not found!!"});
     let image , slug;
-    if(title){slug = slugify(title, { lower: true });}
+    if(name){slug = slugify(name, { lower: true });}
     if (req.file) {
         try {
             image = await uploadImageToCloudinary(req.file.buffer, "products");
@@ -51,7 +51,7 @@ export const updateProduct = async (req, res) => {
             return res.status(500).json({ message: "Image upload failed" });
         }
     }
-    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ title, slug, price, description ,image },{returnDocument:"after"});
+    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ name, slug, price, description ,image },{returnDocument:"after"});
     if (!updatedProduct) return res.status(500).json({ message: "Internal server error" });
     res.status(200).json({ message: "success", data: { updatedProduct } });
 }
