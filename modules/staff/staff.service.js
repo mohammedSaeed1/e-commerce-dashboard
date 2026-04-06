@@ -1,5 +1,5 @@
 import { Staff } from "../../database/model/staff.model.js";
-
+import { Attendance } from "../../database/model/attendance.model.js";
 
 // Staff CRUD operations
 
@@ -37,4 +37,7 @@ export const deleteStaff = async (req,res) =>{
     if (!staff) return res.status(404).json({ message: "this staff is not exists" });
     res.status(200).json({ message: "success"});
 }
+
+// Attendance Apis
+
 
