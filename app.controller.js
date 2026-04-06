@@ -7,6 +7,7 @@ import brandRouter from './modules/brand/brand.controller.js';
 import userRouter from './modules/user/user.controller.js';
 import cartRouter from './modules/cart/cart.controller.js';
 import orderRouter from './modules/order/order.controller.js';
+import staffRouter from './modules/staff/staff.controller.js';
 
 export const bootstrap = () => {
 
@@ -20,6 +21,7 @@ export const bootstrap = () => {
     app.use(`/api/v1/users/profile`,userRouter);
     app.use(`/api/v1/cart`,cartRouter);
     app.use(`/api/v1`,orderRouter);
+    app.use(`/api/v1`,staffRouter);
 
 
     app.listen(3000,()=>{
