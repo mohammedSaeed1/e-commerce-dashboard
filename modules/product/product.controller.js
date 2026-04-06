@@ -4,10 +4,10 @@ import upload from "../../middleware/multer.js";
 
 const router = Router();
 
-router.post('/',upload.single('image'),createProduct);
+router.post('/',upload.array('images'),createProduct);
 router.get('/',getAllProducts);
 router.get('/:id',getProductById);
-router.put('/:id',upload.single('image'),updateProduct);
+router.put('/:id',upload.array('images'),updateProduct);
 router.delete('/:id',deleteProduct);
 
 
