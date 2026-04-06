@@ -1,6 +1,8 @@
 import { Staff } from "../../database/model/staff.model.js";
 
 
+// Staff CRUD operations
+
 export const createStaff = async (req,res) =>{
     const { userId , dailySalary } = req.body;
     const staff = await Staff.create({ user: userId , dailySalary });
@@ -33,5 +35,6 @@ export const deleteStaff = async (req,res) =>{
     const { id } = req.params;
     const staff = await Staff.findByIdAndDelete(id);
     if (!staff) return res.status(404).json({ message: "this staff is not exists" });
-    res.status(200).json({ message: "success", data: {staff } });
+    res.status(200).json({ message: "success"});
 }
+
