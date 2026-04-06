@@ -39,7 +39,7 @@ export const getProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     const {id} = req.params;
-    const { name, description, price} = req.body;
+    const { name, description, price , stock} = req.body;
     const isProduct = await Product.findById(id);
     if(!isProduct) return res.status(404).json({message:"Product is not found!!"});
     let image , slug;
@@ -51,7 +51,7 @@ export const updateProduct = async (req, res) => {
             return res.status(500).json({ message: "Image upload failed" });
         }
     }
-    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ name, slug, price, description ,image },{returnDocument:"after"});
+    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ name, slug, price, description ,image , stock },{returnDocument:"after"});
     if (!updatedProduct) return res.status(500).json({ message: "Internal server error" });
     res.status(200).json({ message: "success", data: { updatedProduct } });
 }
