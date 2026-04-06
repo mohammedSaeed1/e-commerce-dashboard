@@ -6,6 +6,7 @@ import categoryRouter from './modules/category/category.controller.js';
 import brandRouter from './modules/brand/brand.controller.js';
 import userRouter from './modules/user/user.controller.js';
 import cartRouter from './modules/cart/cart.controller.js';
+import orderRouter from './modules/order/order.controller.js';
 
 export const bootstrap = () => {
 
@@ -18,7 +19,7 @@ export const bootstrap = () => {
     app.use(`/api/v1/brands`,brandRouter);
     app.use(`/api/v1/users/profile`,userRouter);
     app.use(`/api/v1/cart`,cartRouter);
-
+    app.use(`/api/v1`,orderRouter);
 
 
     app.listen(3000,()=>{
