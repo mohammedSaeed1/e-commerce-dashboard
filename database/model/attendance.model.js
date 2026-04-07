@@ -10,8 +10,8 @@ const attendanceSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    checkIn: Date,
-    checkOut: Date,
+    checkIn: String,
+    checkOut: String,
     isLate: Boolean,
 },{timestamps:true});
 

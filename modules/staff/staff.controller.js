@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createStaff , getAllStaff , getStaffById , updateStaff , deleteStaff } from "./staff.service.js";
+import { createStaff , getAllStaff , getStaffById , updateStaff , deleteStaff , checkIn } from "./staff.service.js";
 
 const router = Router();
 
@@ -8,6 +8,7 @@ router.get("/admin/staff",getAllStaff);
 router.get("/admin/staff/:id",getStaffById);
 router.put("/admin/staff/:id",updateStaff);
 router.delete("/admin/staff/:id",deleteStaff);
-
+router.post("/staff/checkIn",checkIn);
+router.post("/staff/checkOut",checkIn);
 
 export default router;
