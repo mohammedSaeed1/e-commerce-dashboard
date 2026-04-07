@@ -3,6 +3,8 @@ import { Attendance } from "../../database/model/attendance.model.js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+
 
 // Staff CRUD operations
 
@@ -45,22 +47,48 @@ export const deleteStaff = async (req, res) => {
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(customParseFormat);
 
 export const checkIn = async (req, res) => {
     const { staffId } = req.body;
     const date = dayjs().format("DD MMMM YYYY");
-    
+
+    const staff = await Staff.findById(staffId);
+    if(!staff) return res.status(404).json({message:"this staff is not exists"});
+
     const isAttended = await Attendance.findOne({ staff: staffId, date: date });
     if (isAttended) {
         return res.status(400).json({ message: "Already checked in today" });
     }
-    
-    const now = dayjs().tz('Africa/Cairo');    
+
+    const now = dayjs().tz('Africa/Cairo');
     const nineAM = now.startOf('day').add(9, 'hour');
     const isLate = now.isAfter(nineAM);
-    
-    const attendance = await Attendance.create({ staff: staffId, date, checkIn: now.format('hh:mm:ss A'), isLate});
-    res.status(201).json({ message:"Checked in",data:{attendance} });
+
+    const attendance = await Attendance.create({ staff: staffId, date, checkIn: now.format('hh:mm:ss A'), isLate,type:"check-in" });
+    res.status(201).json({ message: "Checked in success", data: { attendance } });
 };
 
+export const checkOut = async (req, res) => {
+    const { staffId } = req.body;
+    const date = dayjs().format("DD MMMM YYYY");
 
+    const staff = await Staff.findById(staffId);
+    if(!staff) return res.status(404).json({message:"this staff is not exists"});
+
+    const isAttended = await Attendance.findOne({ staff: staffId, date });
+    if (!isAttended) return res.status(404).json({ message: "You're not checked in today!!" });
+
+    const now = dayjs().tz('Africa/Cairo');       
+    const checkIn = dayjs(isAttended.checkIn,'hh:mm:ss A');
+    const checkOut = dayjs(now,'hh:mm:ss A');
+    const totalMinutes = checkOut.diff(checkIn, 'minute');
+    const hours   = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;    
+    const workingHours = `${hours}h : ${minutes}m`;
+    if(hours < 8){
+    // calculate deduction here
+    }
+    const attendance = await Attendance.create({staff:staffId,date,checkOut:checkOut.format("hh:mm:ss A"),workingHours,type:"check-out"});
+    res.status(201).json({message:"checked out success",data:{attendance}});
+}
