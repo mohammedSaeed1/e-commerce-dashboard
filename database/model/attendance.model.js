@@ -13,6 +13,9 @@ const attendanceSchema = new mongoose.Schema({
     checkIn: Date,
     checkOut: Date,
     isLate: Boolean,
-},{timestamps:true})
+},{timestamps:true});
+
+
+attendanceSchema.index({ staff: 1, date: 1 }, { unique: true });
 
 export const Attendance = mongoose.model('attendances',attendanceSchema);
