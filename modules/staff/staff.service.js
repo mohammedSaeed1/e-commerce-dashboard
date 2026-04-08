@@ -98,8 +98,8 @@ export const checkOut = async (req, res) => {
 
 export const addDeduction = async (req , res) =>{
       const {id} = req.params;
-      const {month , amount , reason , date } = req.body;
-      const deduction = await Deduction.create({staff:id,month,amount,reason,date});
+      const {month , amount , reason} = req.body;
+      const deduction = await Deduction.create({staff:id,month,amount,reason});
       if(!deduction) return res.status(500).json({message:"Can't add this deduction now , Internal Server Error"});
       return res.status(201).json({message:"success",data:{deduction}});
 } 
@@ -136,3 +136,5 @@ export const deleteDeduction = async (req , res) =>{
       if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
       return res.status(200).json({message:"success"});
 }
+
+// 
