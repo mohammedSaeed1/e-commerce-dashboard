@@ -10,8 +10,8 @@ import { Deduction } from "../../database/model/deduction.model.js";
 // Staff CRUD operations
 
 export const createStaff = async (req, res) => {
-    const { userId, dailySalary } = req.body;
-    const staff = await Staff.create({ user: userId, dailySalary });
+    const { userId, dailySalary , joinDate , department , isActive , month , totalDaysWorked , finalSalary , isPaid , paidAt } = req.body;
+    const staff = await Staff.create({ user: userId, dailySalary , joinDate , department , isActive , monthlyReports:[{month,totalDaysWorked,finalSalary,isPaid,paidAt}] });
     if (!staff) return res.status(500).json({ message: "Internal server error" });
     res.status(201).json({ message: "success", data: { staff } });
 }
@@ -136,5 +136,3 @@ export const deleteDeduction = async (req , res) =>{
       if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
       return res.status(200).json({message:"success"});
 }
-
-// 
