@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import { Deduction } from "../../database/model/deduction.model.js";
 
 
 // Staff CRUD operations
@@ -91,4 +92,47 @@ export const checkOut = async (req, res) => {
     }
     const attendance = await Attendance.create({staff:staffId,date,checkOut:checkOut.format("hh:mm:ss A"),workingHours,type:"check-out"});
     res.status(201).json({message:"checked out success",data:{attendance}});
+}
+
+// Salary & Deduction APIs
+
+export const addDeduction = async (req , res) =>{
+      const {id} = req.params;
+      const {month , amount , reason , date } = req.body;
+      const deduction = await Deduction.create({staff:id,month,amount,reason,date});
+      if(!deduction) return res.status(500).json({message:"Can't add this deduction now , Internal Server Error"});
+      return res.status(201).json({message:"success",data:{deduction}});
+} 
+
+export const getStaffDeductions = async (req , res) =>{
+      const {id} = req.params;
+      const deductions = await Deduction.find({staff:id});
+      if(deductions.length <= 0) return res.status(404).json({message:"No deductions at this time"});
+      return res.status(200).json({message:"success",data:{deductions}});
+}
+
+export const getDeductionById = async (req , res) =>{
+      const {id} = req.params;
+      const deduction = await Deduction.findById(id);
+      if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
+      return res.status(200).json({message:"success",data:{deduction}});
+}
+
+export const updateDeduction = async (req , res) =>{
+      const {id , deductionId} = req.params;
+      const {amount , reason , date} = req.body;
+      const staff = await Staff.findById(id);
+      if(!staff) return res.status(404).json({message:"this staff is not exists"});
+      const deduction = await Deduction.findByIdAndUpdate(deductionId, {amount , reason , date}, {new:true});
+      if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
+      return res.status(200).json({message:"success",data:{deduction}});
+}
+
+export const deleteDeduction = async (req , res) =>{
+      const {id , deductionId} = req.params;
+      const staff = await Staff.findById(id);
+      if(!staff) return res.status(404).json({message:"this staff is not exists"});
+      const deduction = await Deduction.findByIdAndDelete(deductionId);
+      if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
+      return res.status(200).json({message:"success"});
 }
