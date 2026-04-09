@@ -14,7 +14,8 @@ const attendanceSchema = new mongoose.Schema({
     checkOut: String,
     isLate: Boolean,
     isAbsent: Boolean,
-    workingHours: String,
+    workingHours: Number,
+    month:String,
     type:{
       type:String,
       enum: ["check-in","check-out"],

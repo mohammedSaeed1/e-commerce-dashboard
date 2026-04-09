@@ -65,32 +65,42 @@ export const checkIn = async (req, res) => {
     const now = dayjs().tz('Africa/Cairo');
     const nineAM = now.startOf('day').add(9, 'hour');
     const isLate = now.isAfter(nineAM);
+    const month = dayjs().format("MMMM");
 
-    const attendance = await Attendance.create({ staff: staffId, date, checkIn: now.format('hh:mm:ss A'), isLate,type:"check-in" });
+    const attendance = await Attendance.create({ staff: staffId, date,month,checkIn: now.format('hh:mm:ss A'), isLate,type:"check-in" });
     res.status(201).json({ message: "Checked in success", data: { attendance } });
 };
 
 export const checkOut = async (req, res) => {
     const { staffId } = req.body;
     const date = dayjs().format("DD MMMM YYYY");
-
+    const prevDate = dayjs().subtract(1, 'day').format("DD MMMM YYYY"); 
+    
     const staff = await Staff.findById(staffId);
     if(!staff) return res.status(404).json({message:"this staff is not exists"});
-
-    const isAttended = await Attendance.findOne({ staff: staffId, date });
-    if (!isAttended) return res.status(404).json({ message: "You're not checked in today!!" });
+ 
+    const isCheckedIn = await Attendance.findOne({staff:staffId , date , type:"check-in"});
+    const preDayCheckIn = await Attendance.findOne({staff:staffId , date:prevDate , type:"check-in"});
+       
 
     const now = dayjs().tz('Africa/Cairo');       
-    const checkIn = dayjs(isAttended.checkIn,'hh:mm:ss A');
+    const checkIn = dayjs(isCheckedIn.checkIn,'hh:mm:ss A');
     const checkOut = dayjs(now,'hh:mm:ss A');
     const totalMinutes = checkOut.diff(checkIn, 'minute');
     const hours   = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;    
-    const workingHours = `${hours}h : ${minutes}m`;
+    const month = dayjs().format("MMMM");
+    const workingHours = hours;
     if(hours < 8){
     // calculate deduction here
     }
-    const attendance = await Attendance.create({staff:staffId,date,checkOut:checkOut.format("hh:mm:ss A"),workingHours,type:"check-out"});
+
+    const checkAbsent =  await Attendance.findOne({_id:staffId,date:prevDate,type:"check-out"});
+    if(!checkAbsent && preDayCheckIn){
+   preDayCheckIn.isAbsent = true;
+    await preDayCheckIn.save();
+    } 
+    
+    const attendance = await Attendance.create({staff:staffId,date,month,checkOut:checkOut.format("hh:mm:ss A"),workingHours,type:"check-out"});
     res.status(201).json({message:"checked out success",data:{attendance}});
 }
 
@@ -139,6 +149,36 @@ export const deleteDeduction = async (req , res) =>{
 
 // Monthly Salary Apis
 
+async function calcTotalDaysWorkedPerMonth(id,month){
+    const staff = await Attendance.find({staff:id , month});
+    return staff.length / 2 ;
+}
+async function calcLateDaysPerMonth(id,month){
+    const staff = await Attendance.find({staff:id , month, isLate:true});
+    return staff.length;
+}
+async function calcAbsentDaysPerMonth(id,month){
+    const staff = await Attendance.find({staff:id , month, isAbsent:true});
+    return staff.length;
+}
+
+export const getMonthSalary = async (req , res) =>{
+
+    const {id , month} = req.params;
+    const staff = await Staff.findById(id);
+    if(!staff) return res.status(404).json({message:"this staff is not exsits"});
+    const report = staff.monthlyReports.find(report => report.month == month);
+    if(!report) return res.status(400).json({message:"this month is not allowed !!"});
+    const totalDaysWorked = await calcTotalDaysWorkedPerMonth(id,month);    
+    const lateDays = await calcLateDaysPerMonth(id,month);
+    const absentDays = await calcAbsentDaysPerMonth(id,month);
+    
+    const baseSalary = staff.dailySalary * totalDaysWorked; 
+// Deductions = Late Days × (Daily Salary × 0.1) + Absent Days × Daily Salary +
+// Manual Deductions
+// Final Salary = Base Salary - Deductions + Adjustments
+}
+
 export const markSalaryAsPaid = async (req , res) =>{
       const {id , month} = req.params;
       const staff = await Staff.findById(id);
@@ -149,6 +189,21 @@ export const markSalaryAsPaid = async (req , res) =>{
           staff.monthlyReports.push(report);
      }
      else report.isPaid = true;
+     await staff.save();
+     res.status(200).json({message:"success",data:{staff}});
+    }
+
+    export const adjustSalary = async (req , res) =>{
+      const {id , month} = req.params;
+      const {adjustSalary} = req.body;
+      const staff = await Staff.findById(id);
+      if(!staff) return res.status(404).json({message:"this staff is not exists"});
+      let report = staff.monthlyReports.find(report => report.month == month);     
+     if(!report){
+          report = {month, finalSalary:adjustSalary};
+          staff.monthlyReports.push(report);
+     }
+     else report.finalSalary = adjustSalary;
      await staff.save();
      res.status(200).json({message:"success",data:{staff}});
     }

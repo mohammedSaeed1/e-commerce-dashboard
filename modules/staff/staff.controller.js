@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createStaff , getAllStaff , getStaffById , updateStaff , deleteStaff , checkIn , checkOut , addDeduction,getStaffDeductions,getDeductionById,updateDeduction,deleteDeduction , markSalaryAsPaid } from "./staff.service.js";
+import { createStaff , getAllStaff , getStaffById , updateStaff , deleteStaff , checkIn , checkOut , addDeduction,getStaffDeductions,getDeductionById,updateDeduction,deleteDeduction , markSalaryAsPaid , getMonthSalary , adjustSalary } from "./staff.service.js";
 
 const router = Router();
 
@@ -19,5 +19,7 @@ router.get("/admin/staff/deduction/:id",getDeductionById);
 router.put("/admin/staff/:id/deductions/:deductionId",updateDeduction);
 router.delete("/admin/staff/:id/deductions/:deductionId",deleteDeduction);
 // Monthly Salary routes
+router.get("/admin/staff/:id/salary/:month",getMonthSalary);
 router.post("/admin/staff/:id/salary/:month/pay",markSalaryAsPaid);
+router.post("/admin/staff/:id/salary/:month/adjust",adjustSalary);
 export default router;
