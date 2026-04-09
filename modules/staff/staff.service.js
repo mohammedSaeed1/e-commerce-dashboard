@@ -10,8 +10,8 @@ import { Deduction } from "../../database/model/deduction.model.js";
 // Staff CRUD operations
 
 export const createStaff = async (req, res) => {
-    const { userId, dailySalary , joinDate , department , isActive , month , totalDaysWorked , finalSalary , isPaid , paidAt } = req.body;
-    const staff = await Staff.create({ user: userId, dailySalary , joinDate , department , isActive , monthlyReports:[{month,totalDaysWorked,finalSalary,isPaid,paidAt}] });
+    const { userId, dailySalary , joinDate , department , isActive} = req.body;
+    const staff = await Staff.create({ user: userId, dailySalary , joinDate , department , isActive});
     if (!staff) return res.status(500).json({ message: "Internal server error" });
     res.status(201).json({ message: "success", data: { staff } });
 }
@@ -136,3 +136,19 @@ export const deleteDeduction = async (req , res) =>{
       if(!deduction) return res.status(404).json({message:"this deduction is not exists"});
       return res.status(200).json({message:"success"});
 }
+
+// Monthly Salary Apis
+
+export const markSalaryAsPaid = async (req , res) =>{
+      const {id , month} = req.params;
+      const staff = await Staff.findById(id);
+      if(!staff) return res.status(404).json({message:"this staff is not exists"});
+     let report = staff.monthlyReports.find(report => report.month == month);     
+     if(!report){
+          report = {month, isPaid : true};
+          staff.monthlyReports.push(report);
+     }
+     else report.isPaid = true;
+     await staff.save();
+     res.status(200).json({message:"success",data:{staff}});
+    }
