@@ -5,6 +5,10 @@ import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import { Deduction } from "../../database/model/deduction.model.js";
+import calcTotalDaysWorkedPerMonth from "../../utilts/staff/calcTotalDaysWorkedPerMonth.js";
+import calcLateDaysPerMonth from "../../utilts/staff/calcLateDaysPerMonth.js";
+import calcAbsentDaysPerMonth from "../../utilts/staff/calcAbsentDaysPerMonth.js";
+import calcDeductionsPerMonth from "../../utilts/staff/calcDeductionsPerMonth.js";
 
 
 // Staff CRUD operations
@@ -149,21 +153,7 @@ export const deleteDeduction = async (req , res) =>{
 
 // Monthly Salary Apis
 
-async function calcTotalDaysWorkedPerMonth(id,month){
-    const staff = await Attendance.find({staff:id , month});
-    return staff.length / 2 ;
-}
-async function calcLateDaysPerMonth(id,month){
-    const staff = await Attendance.find({staff:id , month, isLate:true});
-    return staff.length;
-}
-async function calcAbsentDaysPerMonth(id,month){
-    const staff = await Attendance.find({staff:id , month, isAbsent:true});
-    return staff.length;
-}
-
 export const getMonthSalary = async (req , res) =>{
-
     const {id , month} = req.params;
     const staff = await Staff.findById(id);
     if(!staff) return res.status(404).json({message:"this staff is not exsits"});
@@ -172,11 +162,12 @@ export const getMonthSalary = async (req , res) =>{
     const totalDaysWorked = await calcTotalDaysWorkedPerMonth(id,month);    
     const lateDays = await calcLateDaysPerMonth(id,month);
     const absentDays = await calcAbsentDaysPerMonth(id,month);
-    
+    const manualDeductions = await calcDeductionsPerMonth(id,month);
+        
     const baseSalary = staff.dailySalary * totalDaysWorked; 
-    const deductions = lateDays * (staff.dailySalary * 0.1) + absentDays * staff.dailySalary + 0;
+    const deductions = lateDays * (staff.dailySalary * 0.1) + absentDays * staff.dailySalary + manualDeductions;
     const finalSalary = baseSalary - deductions;
- 
+    res.status(200).json({message:"success",data:{baseSalary,deductions,finalSalary,isPaid:report.isPaid}});
 }
 
 export const markSalaryAsPaid = async (req , res) =>{
@@ -207,3 +198,4 @@ export const markSalaryAsPaid = async (req , res) =>{
      await staff.save();
      res.status(200).json({message:"success",data:{staff}});
     }
+
