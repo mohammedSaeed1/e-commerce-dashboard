@@ -174,9 +174,9 @@ export const getMonthSalary = async (req , res) =>{
     const absentDays = await calcAbsentDaysPerMonth(id,month);
     
     const baseSalary = staff.dailySalary * totalDaysWorked; 
-// Deductions = Late Days × (Daily Salary × 0.1) + Absent Days × Daily Salary +
-// Manual Deductions
-// Final Salary = Base Salary - Deductions + Adjustments
+    const deductions = lateDays * (staff.dailySalary * 0.1) + absentDays * staff.dailySalary + 0;
+    const finalSalary = baseSalary - deductions;
+ 
 }
 
 export const markSalaryAsPaid = async (req , res) =>{
