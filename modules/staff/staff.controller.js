@@ -21,5 +21,5 @@ router.delete("/admin/staff/:id/deductions/:deductionId",deleteDeduction);
 // Monthly Salary routes
 router.get("/admin/staff/:id/salary/:month",getMonthSalary);
 router.post("/admin/staff/:id/salary/:month/pay",markSalaryAsPaid);
-router.post("/admin/staff/:id/salary/:month/adjust",adjustSalary);
+router.put("/admin/staff/:id/salary/:month/adjust",adjustSalary);
 export default router;

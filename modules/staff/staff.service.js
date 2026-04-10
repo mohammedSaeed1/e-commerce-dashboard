@@ -183,7 +183,6 @@ export const markSalaryAsPaid = async (req , res) =>{
      await staff.save();
      res.status(200).json({message:"success",data:{staff}});
     }
-
     export const adjustSalary = async (req , res) =>{
       const {id , month} = req.params;
       const {adjustSalary} = req.body;
