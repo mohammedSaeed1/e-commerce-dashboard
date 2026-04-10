@@ -1,4 +1,4 @@
-import { User } from "../../database/model/user.model.js";
+import { User } from "../database/model/user.model.js";
 
 export default function checkUserDeleted(req, res, next) {  
     const { id } = req.params;
