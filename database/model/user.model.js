@@ -20,7 +20,9 @@ const userSchema = new mongoose.Schema({
     },
     avatar:{
         type: String
-    }
+    },
+    isDeleted: Boolean,
+    deletedAt: Date
 })
 
     export const User = mongoose.model('users',userSchema);
