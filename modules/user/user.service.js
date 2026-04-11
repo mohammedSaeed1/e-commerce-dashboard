@@ -16,7 +16,7 @@ export const addProfileImage = async (req, res) => {
     let avatar;
     if (req.file) {
         try {
-            avatar = await uploadImageToCloudinary(req.file.buffer, "Users");
+        avatar = await uploadImageToCloudinary(req.file.buffer, "Users");            
         } catch (err) {
             return res.status(500).json({ message: "Image upload failed" });
         }

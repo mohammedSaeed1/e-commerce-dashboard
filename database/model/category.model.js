@@ -13,7 +13,9 @@ const categorySchema = new mongoose.Schema({
     },
      image:{
         type: String,
-    }
+    },
+    isDeleted:Boolean,
+    deletedAt:Date
 },{timestamps:true})
 
     export const Category = mongoose.model('categories',categorySchema);
