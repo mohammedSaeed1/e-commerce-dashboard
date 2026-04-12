@@ -60,5 +60,8 @@ export const deleteProduct = async (req, res) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
     if (!product) return res.status(404).json({ message: "this product is not exists" });
+    product.isDeleted = true;
+    product.deletedAt = new Date();     
+    await product.save();
     res.status(200).json({ message: "success" });
 }
