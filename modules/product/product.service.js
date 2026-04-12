@@ -74,3 +74,17 @@ export const deleteProduct = async (req, res) => {
     await product.save();
     res.status(200).json({ message: "success" });
 }
+
+export const filterByCategory = async (req,res) => {
+    const {categoryId} = req.params;
+    const products = await Product.find({category:categoryId}).populate('category brand');
+    if (products.length <= 0) return res.status(400).json({ message: "No products at this time" });
+    res.status(200).json({ message: "success", data: {products} });
+}
+
+export const filterBySubCategory = async (req,res) => {
+    const {subcategoryId} = req.params;
+    const products = await Product.find({subCategory:subcategoryId}).populate('category brand');
+    if (products.length <= 0) return res.status(400).json({ message: "No products at this time" });
+    res.status(200).json({ message: "success", data: {products} });
+}
