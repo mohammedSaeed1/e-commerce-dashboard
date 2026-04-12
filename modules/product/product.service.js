@@ -55,6 +55,15 @@ export const updateProduct = async (req, res) => {
     if (!updatedProduct) return res.status(500).json({ message: "Internal server error" });
     res.status(200).json({ message: "success", data: { updatedProduct } });
 }
+export const updateProductStock = async (req,res) => {
+    const {id} = req.params;
+    const {stock} = req.body;
+    const isProduct = await Product.findById(id);
+    if(!isProduct) return res.status(404).json({message:"Product is not found!!"});
+    const updatedProduct = await Product.findByIdAndUpdate(isProduct._id,{ stock },{returnDocument:"after"});
+    if (!updatedProduct) return res.status(500).json({ message: "Internal server error" });
+    res.status(200).json({ message: "success", data: { updatedProduct } });
+}
 
 export const deleteProduct = async (req, res) => {
     const { id } = req.params;
