@@ -4,31 +4,34 @@ import {User} from "../../database/model/user.model.js";
 
 export const addToCart = async (req,res) =>{
      const { userId, productId , quantity } = req.body;
-     const product = await Product.findById(productId);
      const user = await User.findById(userId);
      if(!user) return res.status(404).json({message:"User is not found!!"});
+     const product = await Product.findById(productId);
      if(!product) return res.status(404).json({message:"Product is not found!!"});
+     
+     if(product.stock < 1) return res.status(400).json({message:"Product is out of stock!!"});
+
     const isCart = await Cart.findOne({user:userId});
-    
-    if(!isCart && product.stock >= 1){
+
+    if(!isCart){
      const cart = await Cart.create({user:userId,cartItems:[{product:productId,quantity}]});
-      return res.status(201).json({message:"success",data:{cart}});
-}
+      return res.status(201).json({message:"success",data:{cart}});}
+
 const existingItem = isCart.cartItems.find(item => item.product == productId);
 
-if (existingItem && product.stock >= 1){
+if (existingItem){
     existingItem.quantity += quantity;
     product.stock -= quantity;
     await product.save();
+    await isCart.save();
 return res.status(200).json({message:"success",data:{cart:isCart}});
 }
-if (!existingItem && product.stock >= 1){
+if (!existingItem){
     isCart.cartItems.push({product:productId,quantity});
      product.stock -= quantity;
      await product.save();
 return res.status(200).json({message:"success",data:{cart:isCart}});
 }
-if(product.stock < 1) return res.status(400).json({message:"Product is out of stock!!"});
 } 
 
 export const getCart = async (req,res) =>{
