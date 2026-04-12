@@ -14,6 +14,10 @@ const categorySchema = new mongoose.Schema({
      image:{
         type: String,
     },
+    subcategory:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'subcategories'
+    },
     isDeleted:Boolean,
     deletedAt:Date
 },{timestamps:true})

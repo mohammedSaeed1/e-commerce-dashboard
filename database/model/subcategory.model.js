@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const subcategoriesSchema = new mongoose.Schema({
+const subcategorySchema = new mongoose.Schema({
     name:{
         type: String,
         required: true,
@@ -18,4 +18,4 @@ const subcategoriesSchema = new mongoose.Schema({
     deletedAt:Date
 },{timestamps:true})
 
-    export const Subcategory = mongoose.model('subcategories',subcategoriesSchema);
+    export const Subcategory = mongoose.model('subcategories',subcategorySchema);
